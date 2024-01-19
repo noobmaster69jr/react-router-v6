@@ -1,13 +1,16 @@
 /*
-  WITHOUT using Outlet, use the pre-made components
-  to create the following  path -> Component mapping. 
-  Notice /people/:id is a nested route (with a URL parameter).
+  Using the pre-made components, create the following 
+  path -> Component mapping. Notice /people/:id is a 
+  nested route (with a URL parameter).
 
   / -> Home
   /people -> People
     /people/:id -> Person
+
+  Be sure to have all your Routes in one location
+  and utilize the <Outlet /> component.
 */
-import './App.css'
+
 import * as React from 'react';
 import {
   BrowserRouter as Router,
@@ -15,6 +18,8 @@ import {
   Route,
   useParams,
   Routes,
+  Outlet,
+  useLocation,
 } from 'react-router-dom';
 import { getPeople, getPerson } from './api';
 
@@ -45,10 +50,7 @@ function People() {
           );
         })}
       </ul>
-      <Routes>
-        <Route path="/" element={<h1>Select someone</h1>} />
-        <Route path=":id" element={<Person />}></Route>
-      </Routes>
+      <Outlet />
     </div>
   );
 }
@@ -92,9 +94,10 @@ export default function App() {
 
         {/* Routes go here */}
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/people/*" element={<People />}></Route>
-         
+          <Route path="/people" element={<People />}>
+            <Route path="" element={<h1>Select someone</h1>} />
+            <Route path=":id" element={<Person />} />
+          </Route>
         </Routes>
       </div>
     </Router>
