@@ -1,105 +1,67 @@
 /*
-  Using the pre-made components, create the following 
-  path -> Component mapping. Notice /people/:id is a 
-  nested route (with a URL parameter).
+  1. You're given three components, App, Results and Form. Inside the 
+  App component, creates two Routes. One that will render the Form component
+  when the user is at '/' and the other which will render the Results component
+  when the user is at '/results.
 
-  / -> Home
-  /people -> People
-    /people/:id -> Person
-
-  Be sure to have all your Routes in one location
-  and utilize the <Outlet /> component.
+  2. Refactor the Form component so that when the user submits the form, 
+    you redirect them (declaratively using <Navigate />) to the /results page.
 */
 
 import * as React from 'react';
-import {
-  BrowserRouter as Router,
-  Link,
-  Route,
-  useParams,
-  Routes,
-  Outlet,
-  useLocation,
-} from 'react-router-dom';
-import { getPeople, getPerson } from './api';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import './App.css'
+const submit = () => {
+  // fake AF
+  return new Promise((res) => {
+    setTimeout(() => res(), 500);
+  });
+};
 
-function Home() {
-  return (
-    <React.Fragment>
-      <h1>Home</h1>
-      <p>
-        Welcome to our collection of quotes. Head over to{' '}
-        <Link to="/people">/people</Link> to see our catalog of quotes.
-      </p>
-    </React.Fragment>
-  );
+function Results() {
+  return <h1>Mmmm. Thanks for submitting your favorite food.</h1>;
 }
 
-function People() {
-  const people = getPeople();
+function Form() {
+  const [name, setName] = React.useState('');
+  const [food, setFood] = React.useState('');
+  const [isSubmit, setIsSubmit] = React.useState(false)
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    name === 'name' ? setName(value) : setFood(value);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    submit(name, food).then (() => setIsSubmit(true))
+    
+  };
+
+ 
 
   return (
-    <div className="people">
-      <ul>
-        {people.map(({ id, name, bio }) => {
-          return (
-            <li key={id}>
-              <Link to={id}>{name}</Link>
-              <p>{bio}</p>
-            </li>
-          );
-        })}
-      </ul>
-      <Outlet />
-    </div>
-  );
-}
-
-function Person() {
-  const { id } = useParams();
-  const { quotes, name } = getPerson(id);
-
-  return (
-    <div className="person">
-      <h1>{name}</h1>
-      <ul>
-        {quotes.map((quote) => {
-          return (
-            <li key={quote.id}>
-              <p>"{quote.text}"</p>
-            </li>
-          );
-        })}
-      </ul>
-    </div>
+  isSubmit ? <Navigate to="/results" /> : ( <form onSubmit={handleSubmit}>
+      <label>
+        Your name
+        <input type="text" value={name} onChange={handleChange} name="name" />
+      </label>
+      <label>
+        Favorite Food
+        <input type="text" value={food} onChange={handleChange} name="food" />
+      </label>
+      <button type="submit">Submit</button>
+    </form>)
   );
 }
 
 export default function App() {
   return (
     <Router>
-      <div>
-        <nav>
-          <ul>
-            <li>
-              <Link to="/">Home</Link>
-            </li>
-            <li>
-              <Link to="/people">People</Link>
-            </li>
-          </ul>
-        </nav>
-
-        <hr />
-
-        {/* Routes go here */}
-        <Routes>
-          <Route path="/people" element={<People />}>
-            <Route path="" element={<h1>Select someone</h1>} />
-            <Route path=":id" element={<Person />} />
-          </Route>
-        </Routes>
-      </div>
+      <Routes>
+        <Route path="/" element={<Form />} />
+        <Route path="/results" element={<Results />} />
+      </Routes>
     </Router>
   );
 }
