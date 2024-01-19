@@ -1,71 +1,100 @@
 /*
-  Inside the User component you need to parse the query string from the 
-  URL and then show the information about the selected user (which you can 
-    get from the `users` object).
+  WITHOUT using Outlet, use the pre-made components
+  to create the following  path -> Component mapping. 
+  Notice /people/:id is a nested route (with a URL parameter).
 
-  If no user is selected, show "Select a user".
+  / -> Home
+  /people -> People
+    /people/:id -> Person
 */
+import './App.css'
+import * as React from 'react';
+import {
+  BrowserRouter as Router,
+  Link,
+  Route,
+  useParams,
+  Routes,
+} from 'react-router-dom';
+import { getPeople, getPerson } from './api';
 
-import * as React from "react";
-import { BrowserRouter as Router, Routes, Route, Link , useSearchParams} from "react-router-dom";
+function Home() {
+  return (
+    <React.Fragment>
+      <h1>Home</h1>
+      <p>
+        Welcome to our collection of quotes. Head over to{' '}
+        <Link to="/people">/people</Link> to see our catalog of quotes.
+      </p>
+    </React.Fragment>
+  );
+}
 
-const users = {
-  tylermcginnis: {
-    name: "Tyler McGinnis",
-    handle: "tylermcginnis",
-    avatar:
-      "https://res.cloudinary.com/uidotdev/image/twitter_name/tylermcginnis"
-  },
-  sarah_edo: {
-    name: "Sarah Drasner",
-    handle: "sarah_edo",
-    avatar: "https://res.cloudinary.com/uidotdev/image/twitter_name/sarah_edo"
-  },
-  ralex1993: {
-    name: "Alex Anderson",
-    handle: "ralex1993",
-    avatar: "https://res.cloudinary.com/uidotdev/image/twitter_name/ralex1993"
-  }
-};
+function People() {
+  const people = getPeople();
 
-function User() { 
-  const [q, setQ] = useSearchParams()
-  
-  const user = q.get("id")
- console.log(users[user])
+  return (
+    <div className="people">
+      <ul>
+        {people.map(({ id, name, bio }) => {
+          return (
+            <li key={id}>
+              <Link to={id}>{name}</Link>
+              <p>{bio}</p>
+            </li>
+          );
+        })}
+      </ul>
+      <Routes>
+        <Route path="/" element={<h1>Select someone</h1>} />
+        <Route path=":id" element={<Person />}></Route>
+      </Routes>
+    </div>
+  );
+}
 
- if(user == null){
-  return <div>Select a user</div>
- }
-return <div>
-  <img src={`${users[user].avatar}`} />
-  <h3>{users[user].name}</h3>
-  <h2>{users[user].handle}</h2>
-</div>
-  
+function Person() {
+  const { id } = useParams();
+  const { quotes, name } = getPerson(id);
+
+  return (
+    <div className="person">
+      <h1>{name}</h1>
+      <ul>
+        {quotes.map((quote) => {
+          return (
+            <li key={quote.id}>
+              <p>"{quote.text}"</p>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
 }
 
 export default function App() {
   return (
     <Router>
       <div>
-        <h1>Users</h1>
-        <ul>
-          <li>
-            <Link to="/?id=tylermcginnis">Tyler</Link>
-          </li>
-          <li>
-            <Link to="/?id=sarah_edo">Sarah</Link>
-          </li>
-          <li>
-            <Link to="/?id=ralex1993">Alex</Link>
-          </li>
-        </ul>
+        <nav>
+          <ul>
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/people">People</Link>
+            </li>
+          </ul>
+        </nav>
 
         <hr />
 
+        {/* Routes go here */}
         <Routes>
-          <Route path="/" element={<User />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/people/*" element={<People />}></Route>
+         
         </Routes>
       </div>
     </Router>
