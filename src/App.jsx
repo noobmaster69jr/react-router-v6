@@ -1,48 +1,64 @@
 /*
-  You're given three components, Home, About, and Jobs.
-  
-  1. Using those three components, create the following
-  path -> Component mapping.
+  Create two Routes so that the given navigation works and the proper UI is displayed.
 
-  / -> Home
-  /about -> About
-  /jobs -> Jobs
-
-
-  2. Create a navbar which allows you to navigate
-  between your three routes.
-
+  When the user navigates to /tyler, they should see "Student: tyler".
+  When the user navigates to /invoices/1, they should see "Invoice #1".
 */
 
 import * as React from 'react';
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link , useParams} from 'react-router-dom';
 
-const Home = () => <h1>Home</h1>;
-const About = () => <h1>About</h1>;
-const Jobs = () => <h1>Jobs</h1>;
-const NavBar = () => {
-  return (
-    <>
-      <Link to="/">Home</Link>
-      <Link to="/about">About</Link>
-      <Link to="/jobs">Jobs</Link>
-    </>
-  );
+const Student = () => { 
+ const {username} = useParams()
+ return <h3>Student: {username}</h3>;
+ } 
+
+const Invoice = () => {
+    const {userId} = useParams() 
+    console.log(userId)
+    return <h3>Invoice: {userId}</h3>;
 };
 
 export default function App() {
-    return (<> 
-    <BrowserRouter>
+    
 
-    <NavBar/>
+  return (
+    <Router>
+      <h2>Invoices</h2>
+      <ul>
+        <li>
+          <Link to="/invoices/1">1</Link>
+        </li>
+        <li>
+          <Link to="/invoices/2">2</Link>
+        </li>
+        <li>
+          <Link to="/invoices/3">3</Link>
+        </li>
+        <li>
+          <Link to="/invoices/4">4</Link>
+        </li>
+      </ul>
+      <h2>Students</h2>
+      <ul>
+        <li>
+          <Link to="/tyler">Tyler</Link>
+        </li>
+        <li>
+          <Link to="/jake">Jake</Link>
+        </li>
+        <li>
+          <Link to="/mikenzi">Mikenzi</Link>
+        </li>
+      </ul>
+
+      <hr />
       <Routes>
-        <Route path="/" element={<Home />}></Route>
-        <Route path="/about" element={<About />}></Route>
-        <Route path="/jobs" element={<Jobs />}></Route>
+
+    <Route path="/invoices/:userId" element={<Invoice/>}></Route>
+    <Route path="/:username" element={<Student/>}></Route>
       </Routes>
-    </BrowserRouter>
-  </>
+      {/* Routes go here */}
+    </Router>
   );
-} 
-
-
+}
